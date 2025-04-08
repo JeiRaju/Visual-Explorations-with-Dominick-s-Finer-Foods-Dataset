@@ -59,5 +59,5 @@ To run this project:
 
 1. Clone the repo:
    ```bash
-   git clone https://github.com/yourusername/dominicks-visualization.git
+   git clone https://github.com/JeiRaju/Visual-Explorations-with-Dominick-s-Finer-Foods-Dataset.git
    cd dominicks-visualization
