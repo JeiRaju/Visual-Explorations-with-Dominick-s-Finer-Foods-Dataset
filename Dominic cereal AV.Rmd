@@ -1,0 +1,127 @@
+---
+title: "INFS 5116 - Data Visualization Project"
+output: PDF
+Author: Jei Pratheesh
+---
+
+### ===============================
+### loading required libraries
+### ===============================
+
+```{r}
+library(tidyverse)
+library(scales)
+```
+
+### ===============================
+### Loading the dataset
+### ===============================
+
+```{r}
+# Load the cleaned dataset
+cereals <- read_csv("cleaned_cereal_data.csv")
+```
+
+# --------------------------------------
+# Graphic 1 – Elementary: Units Sold by Promotion Type
+# --------------------------------------
+
+```{r}
+ggplot(cereals, aes(x = SALE)) +
+  geom_bar(fill = "steelblue") +
+  labs(title = "Units Sold by Promotion Type",
+       x = "Promotion Type",
+       y = "Number of Records (Proxies Unit Sales)") +
+  theme_minimal()
+```
+
+# --------------------------------------
+# Graphic 2 – Intermediate: Weekly Sales Trend of a Top UPC
+# --------------------------------------
+
+```{r}
+top_upc <- cereals %>%
+  group_by(UPC) %>%
+  summarise(total_move = sum(MOVE)) %>%
+  slice_max(order_by = total_move, n = 1) %>%
+  pull(UPC)
+
+cereals %>%
+  filter(UPC == top_upc) %>%
+  group_by(WEEK) %>%
+  summarise(weekly_units = sum(MOVE)) %>%
+  ggplot(aes(x = WEEK, y = weekly_units)) +
+  geom_line(color = "tomato", size = 1) +
+  labs(title = paste("Sales Spike Patterns Over Time for Best-Selling Product UPC:", top_upc),
+       x = "Week",
+       y = "Units Sold") +
+  theme_minimal()
+```
+
+
+# --------------------------------------
+# Graphic 3 – Intermediate: Price Distribution by Promotion Type
+# --------------------------------------
+
+```{r}
+ggplot(cereals, aes(x = SALE, y = PRICE)) +
+  geom_boxplot(fill = "skyblue") +
+  labs(title = "Price Distribution by Promotion Type",
+       x = "Promotion Type",
+       y = "Price") +
+  theme_minimal()
+```
+
+# --------------------------------------
+# Graphic 4 – Overall: Price vs. Profit by Promotion
+# --------------------------------------
+
+```{r}
+ggplot(cereals, aes(x = PRICE, y = PROFIT, color = SALE)) +
+  geom_point(alpha = 0.6) +
+  labs(title = "Price vs. Profit Colored by Promotion",
+       x = "Price",
+       y = "Profit") +
+  theme_minimal()
+```
+
+# --------------------------------------
+# Graphic 5 – Multi-Component: Weekly Sales for Top 4 UPCs
+# --------------------------------------
+
+```{r}
+top_upcs <- cereals %>%
+  group_by(UPC) %>%
+  summarise(total_move = sum(MOVE)) %>%
+  slice_max(order_by = total_move, n = 4) %>%
+  pull(UPC)
+
+cereals %>%
+  filter(UPC %in% top_upcs) %>%
+  group_by(UPC, WEEK) %>%
+  summarise(weekly_units = sum(MOVE)) %>%
+  ggplot(aes(x = WEEK, y = weekly_units)) +
+  geom_line() +
+  facet_wrap(~ UPC) +
+  labs(title = "Weekly Sales for Top 4 UPCs",
+       x = "Week",
+       y = "Units Sold") +
+  theme_minimal()
+```
+
+# --------------------------------------
+# Graphic 6 – Multi-Component: Heatmap of Average Profit by Store and Promotion
+# --------------------------------------
+
+```{r}
+cereals %>%
+  group_by(STORE, SALE) %>%
+  summarise(avg_profit = mean(PROFIT, na.rm = TRUE)) %>%
+  ggplot(aes(x = SALE, y = factor(STORE), fill = avg_profit)) +
+  geom_tile() +
+  scale_fill_viridis_c() +
+  labs(title = "Average Profit by Store and Promotion Type",
+       x = "Promotion Type",
+       y = "Store") +
+  theme_minimal()
+```
