@@ -172,7 +172,8 @@ cereals <- cereals %>% mutate(
 price_group_summary <- cereals %>%
   filter(!is.na(PRICE_GROUP)) %>%
   group_by(PRICE_GROUP) %>%
-  summarise(Average_Profit = mean(PROFIT, na.rm = TRUE))
+  summarise(Average_Profit = mean(PROFIT, na.rm = TRUE)) %>%
+  mutate(PRICE_GROUP = factor(PRICE_GROUP, levels = c("Low", "Medium", "High")))
 
 ggplot(price_group_summary, aes(x = PRICE_GROUP, y = Average_Profit)) +
   geom_col(fill = "darkgreen") +
